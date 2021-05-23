@@ -4,7 +4,7 @@
 
 ### 아이템42. 익명 클래스보다는 람다를 사용하라
 
-```+java
+```java
 # 기존 방식
 Collections.sort(words, new Comparator<String>(){
     public int compare(String s1, String s2){
@@ -87,7 +87,7 @@ java.util.fuction 패키지에는 총 **43개** 의 인터페이스가 담겨 �
 
 
 코드 45-2 스트림을 과하게 사용한 예 - 따라하지 말 것!!
-```+java
+```java
 public class Anagrams {
     public static void main(String[] args) throws IOException {
         Path dictionary = Paths.get(args[0]);
@@ -112,7 +112,7 @@ public class Anagrams {
 
 코드 45-3 스트림을 적절히 활용하면 깔금하고 명료해진다.
 
-```+java
+```java
 public class Anagrams {
     public static void main(String[] args) throws IOException {
         Path dictionary = Paths.get(args[0]);
@@ -149,7 +149,7 @@ public class Anagrams {
 
 
 코드 46-1 스트림 패러다임을 이해하지 못한 채 API만 사용한 예 - 따라하지 말 것
-```+java
+```java
 Map<String, Long> freq = new HashMap<>();
 try (Stream<String> words = new Scanner(file).tokens()) {
     words.forEach(word -> {
@@ -164,7 +164,7 @@ foreEach가 그저 스트림이 수행한 연산 결과를 보여주는 일 이�
 
 코드 46-2 스트림을 제대로 활용해 빈도표를 초기화 함.
 
-```+java
+```java
 Map<String, Long> freq;
 try (Stream<String> words = new Scanner(file).tokens()) {
     freq = words.collect(groupingBY(String::toLowerCase, counting()));
@@ -181,7 +181,7 @@ java.util.stream.Collectors 클래스는 메서드를 무려 **39개**나 가지
 
 코드 46-3 빈도표에서 가장 흔한 단어 10개를 뽑아내는 파이프라인
 
-```+java
+```java
 List<String> topTen = freq.keySet().stream()
     .sorted(comparing(freq::get).reversed())
     .limit(10)
