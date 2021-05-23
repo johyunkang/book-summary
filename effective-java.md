@@ -42,7 +42,7 @@ words.sort(comparingInt(String::length));
 
 - 배열 생성자를 가리키는 메서드 참조
 
-| 메서드 참조 유형   |                        | 같은 기능을 하는 람다                              |
+| 메서드 참조 유형   | 예                       | 같은 기능을 하는 람다                              |
 | ------------------ | ---------------------- | -------------------------------------------------- |
 | 정적               | Integer::parseInt      | str -> Integer.parseInt(Str)                       |
 | 한정적(인스턴스)   | Instant.now()::isAfter | Instant then = Instant.now(); t -> then.isAfter(t) |
