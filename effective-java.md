@@ -141,3 +141,57 @@ public class Anagrams {
 - 원소들의 시퀀스를 컬렉션에 모은다.(아마도 공통된 속성을 기준으로 묶어가며).
 - 원소들의 시퀀스에 특정 조건을 만족하는 원소를 찾는다.
 
+    
+## 아이템46. 스트림에서는 부작용 없는 함수를 사용하라.
+
+**스트림은 그저 또 하나의 API가 아닌, 함수형 프로그래밍에 기초한 패러다임. 스트림이 제공하는 표현력, 속도(사황에 따라서는) 병렬성을 얻으려면 API는 말할 것도 없고 이 패러다임까지 함께 받아들여야 함.**
+
+
+
+코드 46-1 스트림 패러다임을 이해하지 못한 채 API만 사용한 예 - 따라하지 말 것
+```+java
+Map<String, Long> freq = new HashMap<>();
+try (Stream<String> words = new Scanner(file).tokens()) {
+    words.forEach(word -> {
+        freq.merge(word.toLowerCase(), 1L, Long::sum);
+    });
+}
+```
+
+foreEach가 그저 스트림이 수행한 연산 결과를 보여주는 일 이상을 하는 것(이 예에서는 람다가 상태를 수정함)을 보니 나쁜 코드일 것 같은 냄새가 남.
+
+
+
+코드 46-2 스트림을 제대로 활용해 빈도표를 초기화 함.
+
+```+java
+Map<String, Long> freq;
+try (Stream<String> words = new Scanner(file).tokens()) {
+    freq = words.collect(groupingBY(String::toLowerCase, counting()));
+}
+```
+
+**forEach 연산은 스트림 계산 결과를 보고할 때만 사용하고, 계산하는 데는 쓰지 말자.**
+
+**수집기(collector) : 스트림을 사용하라면 꼭 배워야 하는 새로운 개념**
+
+java.util.stream.Collectors 클래스는 메서드를 무려 **39개**나 가지고 있음.
+
+수집기는 총 3가지로, **toList(), toSet(), toCollection(collectionFactory)**
+
+코드 46-3 빈도표에서 가장 흔한 단어 10개를 뽑아내는 파이프라인
+
+```+java
+List<String> topTen = freq.keySet().stream()
+    .sorted(comparing(freq::get).reversed())
+    .limit(10)
+    .collect(toList());
+```
+
+* 마지막 toList는 Collectors의 메서드다. 이처럼 Collectors의 멤버를 정적 임포트하여 쓰면 스트림 파이프라인 가독성이 좋아져, 흔히들 이렇게 사용한다.
+
+**Collectors 의 자세한 이해를 위해서는 java.util.stream.Collectors의 API 문서(http://bit.ly/2MvTOAR)을 참조**
+
+**가장 중요한 수집기 팩터리는 toList, toSet, toMap, groupingBy, joining 이다.**
+
+
