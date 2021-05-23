@@ -200,7 +200,7 @@ List<String> topTen = freq.keySet().stream()
 
 * 마지막 toList는 Collectors의 메서드다. 이처럼 Collectors의 멤버를 정적 임포트하여 쓰면 스트림 파이프라인 가독성이 좋아져, 흔히들 이렇게 사용한다.
 
-**Collectors 의 자세한 이해를 위해서는 java.util.stream.Collectors의 API 문서(http://bit.ly/2MvTOAR)을 참조**
+**Collectors 의 자세한 이해를 위해서는 java.util.stream.Collectors의 API 문서( http://bit.ly/2MvTOAR )을 참조**
 
 **가장 중요한 수집기 팩터리는 toList, toSet, toMap, groupingBy, joining 이다.**
 
