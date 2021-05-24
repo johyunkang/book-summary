@@ -204,4 +204,101 @@ List<String> topTen = freq.keySet().stream()
 
 **가장 중요한 수집기 팩터리는 toList, toSet, toMap, groupingBy, joining 이다.**
 
+------
+    
+    
+    
+### 아이템47 반환 타입으로는 스트림보다 컬렉션이 낫다.
+
+반환 원소들이 기본 타입이거나 **성능에 민감**한 상황이리면 **배열**을 써라.
+
+코드 47-1 자바 타입 추론의 한계로 컴파일 되지 않는다.
+```java
+for (ProcessHandle ph : ProcessHandle.allProcess()::iterator) {
+    // 프로세스를 처리한다.
+}
+```
+
+아쉽게도 위 코드는 다음의 컴파일 오류를 낸다.
+
+```java
+Test.java:6: error: method reference not expected here
+    for(ProcessHandle ph : "P"rocessHandle.allProcesses()::iterator){
+```
+
+이 오류를 잡으려면 메서드 참조를 매개변화된 Iterable로 적절히 형변환 해줘야 한다.
+
+코드 47-2 스트림을 반복하기 위한 '끔직한' 우회 방법
+
+```java
+for (ProcessHandle ph : (Iterable<ProcessHandle>)ProcessHandle.allProcess()::iterator) {
+    // 프로세스를 처리한다.
+}
+```
+
+작동은 하지만 너무 난잡하고 직관성이 떨어짐
+
+코드 47-3 Stream<E>를 Iterable<E>로 중개해주는 어댑터
+
+```java
+public static <E> Iterable<E> iterableOf (Stream<E> stream) {
+    return stream::iterator;
+}
+```
+
+위 어댑터를 사용해 어떤 스트림도 for-each 문으로 반복 가능
+
+```java
+for (ProcessHandle p : iterableOf(ProcessHandle.allProcess())) {
+    // 프로세스를 처리한다
+}
+```
+
+
+
+Collection 인터페이스는 Iterable의 하위 타입이고 stream 메서드도 제공하니 반복과 스트림을 동시에 지원한다. 따라서 **원소 시퀀스를 반환하는 공개 API의 반환 타입에는 Collection이나 그 하위 타입을 쓰는 게 일반적으로 최선이다.**
+
+
+
+원소 개수가 n개면 **멱집합**의 원소 개수는 2<sup>n</sup> 개가 된다.
+
+예) {a,b,c} 의 멱집합은 { {}, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c} } 다.
+
+코드 47-5 입력 집합의 멱집합을 전용 컬렉션에 담아 반환한다.
+
+```java
+public class PowerSet {
+    public static final <E> Collection<Set<E>> of(Set<E> s) {
+        List<E> src = new ArrayList<>(s);
+        if (src.size() > 30) // 입력 집합의 원소 수가 30을 넘으면 PowerSet.of 가 예외 던짐
+            throw new IllegalArgumentException ("집합에 원소가 너무 많습니다. 최대 30개.:"+s);
+        
+        return new AbstractList<Set<E>>() {
+            @Override
+            public int size() {
+                // 멱집합의 크기는 2를 원래 집합의 원소 수만큼 거듭제곱 것과 같다.
+                return 1 << src.size();
+            }
+            
+            @Override
+            public boolean contains (Object o) {
+                return o instanceof Set && src.containsAll( (Set)o );
+            }
+            
+            @Override
+            public Set<E> get(int index) {
+                Set<E> result = new HashSet<>();
+                for (int i=0; index != 0; i++, index >>= 1)
+                    if ( (index & 1) == 1 )
+                        result.add(src.get(i));
+                return result;
+            }
+        };
+    }
+}
+```
+
+
+
+------
 
