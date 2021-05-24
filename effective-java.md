@@ -299,6 +299,59 @@ public class PowerSet {
 ```
 
 
-
 ------
 
+    
+    
+### 아이템48 스트림 병렬화는 주의해서 적용하라
+
+데이터 소스가 Stream.iterate거나 중간 연산으로 limit를 쓰면 파이프라인 병렬화로는 성능 개선을 기대할 수 없다.
+
+대체로 스트림의 소스가 ArrayList, HashMap, HashSet, ConcurrentHashMap의 인스턴스거나 배열, int 범위, long 범위일 때 병렬화의 효과가 가장 좋다.
+
+참조 지역성은 다량의 데이터를 처리하는 벌크 연산을 병렬화할 때 아주 중요한 요소로 작용한다. 참조 지역성이 가장 뛰어난 자료구조는 기본 타입의 배열이다. 기본 타입 배열에서는 (참조가 아닌) 데이터 자체가 메모리에 연속해서 저장되기 때문이다.
+
+종단 연산 중 병렬화에 가장 적합한 것은 축소(reduction)다. (min, max, count, sum, anyMatch, allMatch 등)
+
+직접 구현한 Stream, Iterable, Collection이 병렬화의 이점을 제대로 누리게 하고 싶다면 <u>spliterator 메서드를 반드시 재정의</u>하고 결과 스트림의 병렬화의 성능을 강도 높게 테스트하라.
+
+스트림 안의 원소 수와 원소당 수행되는 코드 줄 수를 곱해보자. 이 값이 최소 수십만은 되어야 성능 향상을 맛볼 수 있다.
+
+단, 조건이 잘 갖춰지면 parallel 메서드 호출 하나로 거의 프로세스 코어 수에 비례하는 성능 향상을 만끽할 수 있다.
+
+코드 48-2 소수 계산 스트림 파이프라인 - 병렬화에 적합하다.
+
+```java
+static long pi(long n) {
+    return LongStream.rangeClosed(2, n)
+        .mapToObj(BigInteger::valueOf)
+        .filter(i -> i.isProbablePrime(50))
+        .count();
+}
+```
+
+코드 48-3 소수 계산 스트림 파이프라인 - 병렬화 버전
+
+```java
+static long pi(long n) {
+    return LongStream.rangeClosed(2, n)
+        .parallel()
+        .mapToObj(BigInteger::valueOf)
+        .filter(i -> i.isProbablePrime(50))
+        .count();
+}
+```
+
+코드 48-2 로 파이(10<sup>8</sup>)을 계산하는데 31초, 코드 48-3은 parallel() 호출 하나 추가로, 9.2 초로 단축됨.
+
+
+
+무작위 수들로 이뤄진 스트림을 병렬화하려거든 ThreadLocalRandom(혹은 구식인 Random)보다는 SplittableRandom 인스턴스를 이용하자. SplittableRandom은 정확히 이럴 때 쓰고자 설계된 것이라 <u>병렬화하면 성능이 선형으로 증가</u>한다.
+
+그냥 Random은 모든 연산을 동기화하기 때문에 병렬 처리하면 최악의 성능을 보일 것이다.
+
+------
+    
+    
+    
+    
