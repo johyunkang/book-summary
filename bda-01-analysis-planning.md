@@ -1487,7 +1487,27 @@ P.1-103
 
 ###### (5) 빅데이터 저장기술 - NoSQL
 
-NoSQL = Not only SQL
+- NoSQL = Not only SQL. 고정된 테이블 스키마가 필요하지 않고 조인(Join)연산을 사용할 수 없음. 수평적으로 확장이 가능한 DBMS
+- 대부분 오픈 소스이며 구글 BigTable, 아파치 HBase, 아마존 SimpleDB, 마이크로소프트 SSDS 등이 있다.
+
+| 유형                     | 설명                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| Key-Value Store          | Unique 한 Key에 하나의 Value<br>예) Redis, DynamoDb          |
+| Column Family Data Store | Key 안에 (Column, Value) 조합으로 된 여러개의 필드를 갖는 DB<br>HBase, Cassandra |
+| Document Store           | Value의 데이터 타입이 Document 라는 타입<br>MongoDB, Couchbase |
+| Graph Store              | 시맨틱 웹과 온톨로지 분야에서 활용되는 그래프로 데이터를 표현<br>Neo4j, AllegroGraph |
+
+> 시맨틱 웹(Semantic Web) : 온톨로지를 활용하여 서비스를 기술하고, 온톨로지의 의미적 상호 운용성을 이용해서 서비스 검색, 조합, 중재 기능을 자동화하는 웹이다.
+>
+> 온톨로지(Ontology) : 실세계에 존재하는 모든 개념과 개념들의 속성, 그리고 개념 간의 관계 정보를 컴퓨터가 이해할 수 있도록 서술해 놓은 지식베이스이다.
+
+
+
+###### (6) 빅데이터 저장 고려사항
+
+중요하지 않음
+
+
 
 
 
